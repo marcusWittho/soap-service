@@ -7,7 +7,7 @@
  ```
 
 ### Testar o serviço
-Para fazer testar pode ser utilizado o SOAPUI, outra opção seria a execução do comando abaixo no terminal
+Para testar pode ser utilizado o SoapUI, outra opção seria a execução do comando abaixo no terminal
 
  ```bash
   // Acessar a pasta resources e executar o comando abaixo
