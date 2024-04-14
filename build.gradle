@@ -14,6 +14,7 @@ java {
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
+		canBeResolved=true
 	}
 }
 
@@ -27,6 +28,37 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springframework.boot:spring-boot-starter-parent:3.2.4'
+	implementation 'org.springframework.boot:spring-boot-starter-web-services:3.2.4'
+	implementation 'wsdl4j:wsdl4j:1.6.3'
+	implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
+	compileOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
+	compileOnly 'org.codehaus.mojo:jaxb2-maven-plugin:3.1.0'
+	compileOnly 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.0'
+	compileOnly 'com.sun.xml.bind:jaxb-core:3.0.0'
+	compileOnly 'com.sun.xml.bind:jaxb-impl:3.0.0'
+	compileOnly 'javax.xml.bind:jaxb-api:2.3.1'
+}
+
+task generateJaxb {
+	ext.generatedDir = file("$buildDir/generated-sources/jaxb")
+
+	inputs.files(fileTree("src/main/resources") { include "**/*.xsd" })
+	outputs.dir(generatedDir)
+
+	doLast {
+		project.mkdir(generatedDir)
+
+		ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.compileOnly.asPath)
+		ant.xjc(destdir: generatedDir, package: 'com.example.generated') {
+			schema(dir: 'src/main/resources', includes: '**/*.xsd')
+		}
+	}
+}
+
+compileJava {
+	dependsOn generateJaxb
+	sourceSets.main.java.srcDir generateJaxb.generatedDir
 }
 
 tasks.named('test') {
